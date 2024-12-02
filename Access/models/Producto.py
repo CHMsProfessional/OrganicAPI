@@ -8,6 +8,7 @@ class Producto(models.Model):
     nombre = models.CharField(max_length=255)
     descripcion = models.TextField()
     costo_puntos = models.DecimalField(max_digits=10, decimal_places=2)
+    imagen = models.ImageField(upload_to='productos/', null=True, blank=True)
 
     def __str__(self):
         return f"{self.nombre} - {self.empresa.nombre}"

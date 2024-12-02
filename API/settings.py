@@ -9,9 +9,11 @@ https://docs.djangoproject.com/en/5.0/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
+import os
 from datetime import timedelta
 from pathlib import Path
 from django.core.management.commands.runserver import Command as runserver
+from django.template.context_processors import media
 
 runserver.default_port = "8000"
 
@@ -33,10 +35,6 @@ ALLOWED_HOSTS = [
 
 
 # tokens for API Communication
-API_TOKEN = {
-    'SurtidorApi': 'k1l2m3n4o5p6q7r8s9t0',
-    'RefineriaApi': 'u1v2w3x4y5z6a7b8c9d0'
-}
 
 SELF_API_TOKEN = 'a1b2c3d4e5f6g7h8i9j0'
 
@@ -105,6 +103,10 @@ DATABASES = {
         'PORT': '35195',
     }
 }
+
+MEDIA_URL = 'api/media/'  # URL pública para archivos multimedia
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Ruta en el sistema de archivos para almacenar los archivos
+
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
