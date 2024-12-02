@@ -104,7 +104,7 @@ DATABASES = {
     }
 }
 
-MEDIA_URL = 'api/media/'  # URL pública para archivos multimedia
+MEDIA_URL = 'media/'  # URL pública para archivos multimedia
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')  # Ruta en el sistema de archivos para almacenar los archivos
 
 
