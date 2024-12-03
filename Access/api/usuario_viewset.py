@@ -3,7 +3,7 @@ from rest_framework import serializers, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from Access.api import SimpleUserSerializer, MetodoPagoSerializer, EmpresaSerializer
+from Access.api import SimpleUserSerializer, MetodoPagoSerializer, EmpresaSerializer, CompraSerializer
 from Access.api.newsletter_viewset import NewsletterSerializer
 from Access.models import Usuarios
 
@@ -172,3 +172,12 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             'message': 'Email added to newsletter successfully',
             'data': email_serializer.data
         }, status=status.HTTP_200_OK)
+
+    @action(detail=True, methods=['get'], url_path='get_all_compras_from_user')
+    def get_all_compras_from_user(self, request, pk=None):
+        user = self.get_object()
+        compras = user.compras.all()
+        if not compras:
+            return Response({'error': 'User has no purchases'}, status=status.HTTP_404_NOT_FOUND)
+        serializer = CompraSerializer(compras, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
