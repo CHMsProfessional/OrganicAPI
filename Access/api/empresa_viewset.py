@@ -29,32 +29,53 @@ class EmpresaViewSet(viewsets.ModelViewSet):
         usuario = serializer.validated_data['propietario']
         usuario.has_Empresa = True
         usuario.save()
+
         self.perform_create(serializer)
         headers = self.get_success_headers(serializer.data)
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def update(self, request, *args, **kwargs):
+        # Verifica permisos
         response = self.check_permissions(request)
         if response:
             return response
+
         partial = kwargs.pop('partial', False)
         instance = self.get_object()
+
+        # Serializa y valida los datos
         serializer = self.get_serializer(instance, data=request.data, partial=partial)
         serializer.is_valid(raise_exception=True)
 
-        print(serializer.validated_data['propietario'])
-
+        # Lógica para manejar el cambio de propietario
         if 'propietario' in request.data:
+            # Desasocia el propietario anterior
             usuarioAntiguo = instance.propietario
             usuarioAntiguo.has_Empresa = False
             usuarioAntiguo.save()
 
+            # Asocia el nuevo propietario
             usuario = serializer.validated_data['propietario']
             usuario.has_Empresa = True
             usuario.save()
 
+        # Lógica para manejar la actualización de la imagen
+        current_image_path = instance.imagen.path if instance.imagen else None
+        new_image = request.FILES.get('imagen', None)
+
+        if new_image:
+            import os
+            # Elimina la imagen anterior si existe
+            if current_image_path and os.path.exists(current_image_path):
+                os.remove(current_image_path)
+
+            # Asigna la nueva imagen sin guardar aún
+            instance.imagen = new_image
+
+        # Realiza la actualización del resto de los campos
         self.perform_update(serializer)
 
+        # Maneja caché prefetch si es necesario
         if getattr(instance, '_prefetched_objects_cache', None):
             instance._prefetched_objects_cache = {}
 
@@ -64,6 +85,12 @@ class EmpresaViewSet(viewsets.ModelViewSet):
         instance = self.get_object()
         usuario = instance.propietario
         usuario.has_Empresa = False
+
+        if instance.imagen:
+            import os
+            if os.path.exists(instance.imagen.path):
+                os.remove(instance.imagen.path)
+
         usuario.save()
         self.perform_destroy(instance)
         return Response(status=status.HTTP_204_NO_CONTENT)
