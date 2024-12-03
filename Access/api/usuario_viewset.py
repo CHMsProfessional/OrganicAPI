@@ -107,11 +107,14 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     @action(detail=True, methods=['post'], url_path='add_metodo_pago')
     def add_metodo_pago(self, request, pk=None):
         user = self.get_object()
-        metodo_pago = MetodoPagoSerializer(data=request.data)
+        data = request.data
+        data = {**data, 'usuario': user.id}
+        metodo_pago = MetodoPagoSerializer(data=data)
 
         # Validar los datos del método de pago
         if not metodo_pago.is_valid():
-            return Response({'error': 'Invalid data'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Invalid data', 'details': metodo_pago.errors},
+                            status=status.HTTP_400_BAD_REQUEST)
 
         # Verificar si el número de tarjeta ya existe para el usuario
         if user.metodos_pago.filter(numero_tarjeta=metodo_pago.validated_data['numero_tarjeta']).exists():
