@@ -4,7 +4,7 @@ from rest_framework import serializers, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 
-from Access.api import ProductoSerializer
+from Access.api import ProductoSerializer, SuscripcionEmpresaSerializer
 from Access.api.simple_serializers import SimpleUsuarioSerializer, SimpleProductoSerializer, \
     SimpleSuscripcionSerializer, SimpleNoticiaSerializer
 from Access.models import Empresa
@@ -109,7 +109,7 @@ class EmpresaViewSet(viewsets.ModelViewSet):
     def empresa_suscripciones(self, request, pk=None):
         empresa = self.get_object()
         suscripciones = empresa.suscripciones.all()
-        serializer = SimpleSuscripcionSerializer(suscripciones, many=True)
+        serializer = SuscripcionEmpresaSerializer(suscripciones, many=True)
 
         return Response(serializer.data, status=status.HTTP_200_OK)
 
