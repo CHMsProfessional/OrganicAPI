@@ -1,4 +1,5 @@
-from rest_framework import serializers, viewsets
+from rest_framework import serializers, viewsets, status
+from rest_framework.response import Response
 
 from Access.api.simple_serializers import SimpleUsuarioSerializer, SimpleEmpresaSerializer, SimpleMetodoPagoSerializer, \
     SimpleSuscripcionSerializer, SimpleProductoSerializer
@@ -14,6 +15,8 @@ class CompraSerializer(serializers.ModelSerializer):
     metodo_pago_data = SimpleMetodoPagoSerializer(read_only=True, source='metodo_pago', required=False)
     productos_data = SimpleProductoSerializer(read_only=True, many=True, source='productos', required=False)
 
+    fecha_validez = serializers.DateTimeField(source='fecha_validez_final', read_only=True)
+
     class Meta:
         model = Compra
         fields = '__all__'
@@ -22,3 +25,20 @@ class CompraSerializer(serializers.ModelSerializer):
 class CompraViewSet(viewsets.ModelViewSet):
     queryset = Compra.objects.all()
     serializer_class = CompraSerializer
+
+    def create(self, request, *args, **kwargs):
+        response = self.check_permissions(request)
+        if response:
+            return response
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+
+        if 'metodo_pago' in request.data:
+            serializer.validated_data['confirmada'] = True
+        else:
+            serializer.validated_data['confirmada'] = False
+
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)

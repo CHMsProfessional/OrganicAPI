@@ -1,10 +1,11 @@
 from rest_framework import serializers, viewsets
 
+from Access.api.simple_serializers import SimpleUsuarioSerializer
 from Access.models import MetodoPago
 
 
 class MetodoPagoSerializer(serializers.ModelSerializer):
-    usuario = serializers.StringRelatedField(read_only=True)
+    usuario_data = SimpleUsuarioSerializer(read_only=True, required=False, source='usuario')
 
     class Meta:
         model = MetodoPago
