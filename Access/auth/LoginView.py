@@ -39,6 +39,7 @@ class LoginView(View):
 
             return JsonResponse({
                 'message': 'Inicio de sesion exitoso',
+                'username_id': user.id,  # Se agrega el id del usuario para facilitar la navegación en la app
                 'username': user.username,
                 'is_admin': es_admin,
                 'has_empresa': tiene_empresa
