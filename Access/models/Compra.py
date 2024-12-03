@@ -12,7 +12,7 @@ class Compra(models.Model):
     productos = models.ManyToManyField(Producto)
     fecha_compra = models.DateTimeField(auto_now_add=True)
     costo_total = models.DecimalField(max_digits=10, decimal_places=2, default=0)
-    confimada = models.BooleanField(default=False)
+    confirmada = models.BooleanField(default=False)
 
     def obtener_costo_total(self):
         costo_puntos_total = 0
