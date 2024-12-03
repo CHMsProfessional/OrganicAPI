@@ -26,6 +26,9 @@ class LoginView(View):
         # Autentica al usuario
         user = authenticate(request, username=username, password=password)
 
+        #obtiene el primer usuario asociado a la cuenta
+        usuario = Usuarios.objects.filter(user=user).first()
+
         if user is not None:
             login(request, user)
 
@@ -39,7 +42,7 @@ class LoginView(View):
 
             return JsonResponse({
                 'message': 'Inicio de sesion exitoso',
-                'username_id': user.id,  # Se agrega el id del usuario para facilitar la navegación en la app
+                'username_id': usuario.id,  # Se agrega el id del usuario para facilitar la navegación en la app
                 'username': user.username,
                 'is_admin': es_admin,
                 'has_empresa': tiene_empresa
