@@ -1,3 +1,5 @@
+import os
+
 from rest_framework import serializers, viewsets, status
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -60,14 +62,14 @@ class EmpresaViewSet(viewsets.ModelViewSet):
             usuario.save()
 
         # Lógica para manejar la actualización de la imagen
-        current_image_path = instance.imagen.path if instance.imagen else None
         new_image = request.FILES.get('imagen', None)
 
         if new_image:
-            import os
             # Elimina la imagen anterior si existe
-            if current_image_path and os.path.exists(current_image_path):
-                os.remove(current_image_path)
+            if instance.imagen:  # Solo si hay una imagen actual
+                current_image_path = instance.imagen.path
+                if os.path.exists(current_image_path):
+                    os.remove(current_image_path)
 
             # Asigna la nueva imagen sin guardar aún
             instance.imagen = new_image
